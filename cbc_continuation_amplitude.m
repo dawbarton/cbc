@@ -46,7 +46,7 @@ function exp = cbc_continuation_amplitude(exp, varargin)
 %         different scales (adaptive = true only).
 %
 %     debug: allowed values are true or false. Default false.
-%         Print the step size at each iteration.
+%         Print the step size at each iteration (adaptive = true only).
 %
 %     plotting: allowed values are true or false. Default true.
 %         Plot the amplitudes of the input and response as the continuation
