@@ -22,7 +22,7 @@ for fieldcell = exp.datafields.dynamic_fields
 end
 
 % Get stream data 
-[~, data] = rtc.run_stream(exp.datafields.stream_id, false);
+data = rtc.run_stream(exp.datafields.stream_id, 'start', false, 'struct', true);
 for fieldcell = exp.datafields.stream_fields
     field = fieldcell{1};
     pt.(field) = data.(field);
