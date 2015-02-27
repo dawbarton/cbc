@@ -84,17 +84,16 @@ p.addParameter('debug', false, @islogical);
 p.parse(varargin{:});
 
 % Get the RTC handle
-if isa(exp, 'rtc_generic_interface')
-    rtc = exp;
-    exp = cbc_create_experiment(rtc, p.Unmatched); % Pass through unused options
+if ~isfield(exp, 'rtc')
+    exp = cbc_create_experiment(exp, p.Unmatched); % Pass through unused options
 else
-    rtc = exp.rtc;
-    if ~isempty(p.Unmatched)
+    if ~isempty(fieldnames(p.Unmatched))
         unmatched = fieldnames(p.Unmatched)';
         unmatched(2, 1:end-1) = {' '};
         error('Unknown parameter(s): %s', [unmatched{:}]);
     end
 end
+rtc = exp.rtc;
 
 % Check that the controller is active
 if ~rtc.par.x_control
@@ -204,7 +203,7 @@ while ((exp.cont_par.direction >= 0) && (exp.data(end).x_amp < exp.cont_par.x_ra
     save(fullfile('data', exp.name), 'exp');
     % Plot the data
     if exp.cont_par.plotting
-        plot(ax, exp.data(end).out_amp, exp.data(end).x_amp, 'b.');
+        plot(ax, exp.data(end).out_amp, exp.data(end).x_amp, [exp.cont_par.colour '.']);
         title(ax, sprintf('forcing = %g, response = %g', exp.data(end).out_amp, exp.data(end).x_amp));
         drawnow;
     end
