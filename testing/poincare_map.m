@@ -1,7 +1,7 @@
 function [M, x_0, x_1] = poincare_map(rtc, perturb, n_samples, n_cycles_per_sample)
 
 % Size and duration of perturbations
-perturb_default = [1, 1.25]; 
+perturb_default = [1, 0.25]; 
 if ~exist('perturb', 'var')
     perturb_duration = perturb_default(1);
     perturb_size = perturb_default(2);
@@ -37,7 +37,7 @@ duration = ceil((n_cycles_per_sample + 1)*double(sample_freq)/rtc.par.forcing_fr
 rtc.set_stream(1, {'time_mod_2pi', 'x'}, duration, 0);
 
 % Get the basic motion
-[~, data] = rtc.run_stream(1);
+data = rtc.run_stream(1, 'struct', true);
 
 % Smooth the data
 [B, A] = butter(8, 0.05, 'low');
@@ -62,14 +62,20 @@ eps = 3*norm(sqrt(rtc.par.x_coeffs_var));
 x_0 = zeros(2, n_samples*n_cycles_per_sample);
 x_1 = zeros(2, n_samples*n_cycles_per_sample);
 idx = 1;
+forcing_amp = rtc.par.forcing_amp;
+if forcing_amp == 0
+    forcing_amp_perturb = perturb_size;
+else
+    forcing_amp_perturb = forcing_amp*perturb_size;
+end
 % forcing_amp = rtc.par.forcing_amp;
 for i = 1:n_samples
     % Perturb
-    rtc.par.forcing_amp = 0.3;
+    rtc.par.forcing_amp = forcing_amp + forcing_amp_perturb;
     pause(perturb_duration);
-    rtc.par.forcing_amp = 0;
+    rtc.par.forcing_amp = forcing_amp;
     % Get the data
-    [~, data] = rtc.run_stream(1);
+    data = rtc.run_stream(1, 'struct', true);
     % Smooth the data
     [B, A] = butter(8, 0.05, 'low');
     data.x = filtfilt(B, A, double(data.x));
