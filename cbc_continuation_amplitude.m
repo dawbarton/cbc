@@ -41,7 +41,7 @@ function exp = cbc_continuation_amplitude(exp, varargin)
 %
 %     step_norm: allowed values are [a, b]. Default [1, 1].
 %         The norm of the step is calculated as 
-%           sqrt(step_norm(1)*delta_x^2 + step_norm(2)*delta_out^2)
+%           sqrt((step_norm(1)*delta_x)^2 + (step_norm(2)*delta_out)^2)
 %         to allow for adjustment if the response and the input are on
 %         different scales (adaptive = true only).
 %
@@ -182,7 +182,7 @@ while ((exp.cont_par.direction >= 0) && (exp.data(end).x_amp < exp.cont_par.x_ra
         % Check what the step actually was
         x_amp = norm(rtc.par.x_coeffs_ave(exp.fourier.idx_AC));
         out_amp = norm(rtc.par.out_coeffs_ave(exp.fourier.idx_AC));
-        step = sqrt(exp.cont_par.step_norm(1)*(exp.data(end).x_amp - x_amp)^2 + exp.cont_par.step_norm(2)*(exp.data(end).out_amp - out_amp)^2);
+        step = sqrt((exp.cont_par.step_norm(1)*(exp.data(end).x_amp - x_amp))^2 + (exp.cont_par.step_norm(2)*(exp.data(end).out_amp - out_amp))^2);
         % Apply a linear scaling - probably not reliable for small steps
         h_scale = step_ideal/step;
         if h_scale > exp.cont_par.h_max_scale
