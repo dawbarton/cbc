@@ -69,18 +69,25 @@ function exp = cbc_continuation_amplitude(exp, varargin)
 % Parse the input
 p = inputParser();
 p.KeepUnmatched = true;
+if ismethod(p, 'addParameter')
+    % New versions of Matlab
+    add_par = @p.addParameter;
+else
+    % Old versions of Matlab
+    add_par = @p.addParamValue;
+end
 p.addOptional('direction', 1, @(x)or(x == -1, x == +1));
-p.addParameter('out_range', [0, Inf], @(x)(x(2) > x(1)));
-p.addParameter('x_range', [0, Inf], @(x)(x(2) > x(1)));
-p.addParameter('h0', 0.01, @(x)(x > 0));
-p.addParameter('h_max_scale', 1.5, @(x)(x > 0));
-p.addParameter('step_range', [0, 1], @(x)(x(2) > x(1)));
-p.addParameter('step_norm', [1, 1]);
-p.addParameter('adaptive', true, @islogical);
-p.addParameter('plotting', true, @islogical);
-p.addParameter('hold', false, @islogical);
-p.addParameter('colour', 'b');
-p.addParameter('debug', false, @islogical);
+add_par('out_range', [0, Inf], @(x)(x(2) > x(1)));
+add_par('x_range', [0, Inf], @(x)(x(2) > x(1)));
+add_par('h0', 0.01, @(x)(x > 0));
+add_par('h_max_scale', 1.5, @(x)(x > 0));
+add_par('step_range', [0, 1], @(x)(x(2) > x(1)));
+add_par('step_norm', [1, 1]);
+add_par('adaptive', true, @islogical);
+add_par('plotting', true, @islogical);
+add_par('hold', false, @islogical);
+add_par('colour', 'b');
+add_par('debug', false, @islogical);
 p.parse(varargin{:});
 
 % Get the RTC handle

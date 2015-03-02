@@ -26,11 +26,18 @@ function exp = cbc_create_experiment(rtc, varargin)
  
 % Parse the input
 p = inputParser();
-p.addParameter('default_fields', true, @islogical);
-p.addParameter('static_fields', {}, @iscellstr);
-p.addParameter('dynamic_fields', {}, @iscellstr);
-p.addParameter('stream_fields', {}, @iscellstr);
-cellfun(@p.addParameter, fieldnames(rtc.opt), struct2cell(rtc.opt)); % Add all fields in opt as potential options
+if ismethod(p, 'addParameter')
+    % New versions of Matlab
+    add_par = @p.addParameter;
+else
+    % Old versions of Matlab
+    add_par = @p.addParamValue;
+end
+add_par('default_fields', true, @islogical);
+add_par('static_fields', {}, @iscellstr);
+add_par('dynamic_fields', {}, @iscellstr);
+add_par('stream_fields', {}, @iscellstr);
+cellfun(add_par, fieldnames(rtc.opt), struct2cell(rtc.opt)); % Add all fields in opt as potential options
 p.parse(varargin{:});
 
 % Store the interface to the RTC
