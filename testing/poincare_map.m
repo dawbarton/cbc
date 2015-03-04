@@ -17,7 +17,7 @@ end
 
 % Number of samples (perturbations) to make
 if ~exist('n_samples', 'var')
-    n_samples = 10;
+    n_samples = 40;
 end
 
 % Number of cycles of decay to consider; for high damping this should be
@@ -71,9 +71,15 @@ end
 % forcing_amp = rtc.par.forcing_amp;
 for i = 1:n_samples
     % Perturb
-    rtc.par.forcing_amp = forcing_amp + forcing_amp_perturb;
-    pause(perturb_duration);
-    rtc.par.forcing_amp = forcing_amp;
+    if i <= n_samples/2
+        rtc.par.forcing_amp = forcing_amp - forcing_amp_perturb;
+        pause(perturb_duration);
+        rtc.par.forcing_amp = forcing_amp;
+    else
+        rtc.par.forcing_coeffs(rtc.fourier.idx_cos(1)) = perturb_size;
+        pause(perturb_duration);
+        rtc.par.forcing_coeffs(rtc.fourier.idx_cos(1)) = 0;
+    end
     % Get the data
     data = rtc.run_stream(1, 'struct', true);
     % Smooth the data
@@ -87,7 +93,7 @@ for i = 1:n_samples
     data.time_mod_2pi = data.time_mod_2pi/(2*pi) + cumsum([0, double(diff(data.time_mod_2pi) < 0)]);
     % Find the x values at t=0 (mod 2 pi)
     x_vals = interp1(data.time_mod_2pi', [data.x; data.dx]', 1:n_cycles_per_sample+1)';
-    j_max = min([length(x_vals), find(x_vals > eps, 1, 'last')]);
+    j_max = min([length(x_vals), find(abs(x_vals) > eps, 1, 'last')]);
     % Iterate over the found (and acceptably far away from steady-state) values
     for j = 2:j_max
         x_0(:, idx) = x_vals(:, j - 1) - x_fixed;
@@ -97,6 +103,8 @@ for i = 1:n_samples
 end
 x_0 = x_0(:, 1:idx-1);
 x_1 = x_1(:, 1:idx-1);
+
+figure; plot3(x_0(1, :), x_0(2, :), x_1(1,:), '.');
 
 % Use least-squares to calculate the monodromy matrix
 M = x_1 / x_0;
