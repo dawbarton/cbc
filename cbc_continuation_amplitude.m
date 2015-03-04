@@ -88,6 +88,7 @@ add_par('plotting', true, @islogical);
 add_par('hold', false, @islogical);
 add_par('colour', 'b');
 add_par('debug', false, @islogical);
+add_par('max_fails', 5, @(x)(x > 0));
 p.parse(varargin{:});
 
 % Get the RTC handle
@@ -168,6 +169,7 @@ end
 
 % Iterate - 
 % Check that we are in range according to the direction we are going
+failed = 0;
 while ((exp.cont_par.direction >= 0) && (exp.data(end).x_amp < exp.cont_par.x_range(2)) && (exp.data(end).out_amp < exp.cont_par.out_range(2))) || ...
         ((exp.cont_par.direction < 0) && (target > 0) && (exp.data(end).x_amp > exp.cont_par.x_range(1)) && (exp.data(end).out_amp > exp.cont_par.out_range(1)))
     % Set the new target
@@ -192,8 +194,15 @@ while ((exp.cont_par.direction >= 0) && (exp.data(end).x_amp < exp.cont_par.x_ra
         h = h*h_scale;
         if (step < exp.cont_par.step_range(1)) || (step > exp.cont_par.step_range(2))
             warning([mfilename ':rejected_step'], '%s: Rejected step - step size is %g', datestr(now, 13), h);
-            continue
+            failed = failed + 1;
+            if failed > exp.cont_par.max_fails
+                warning([mfilename ':max_rejected_steps'], '%s: Too many rejected steps', datestr(now, 13));
+                break
+            else
+                continue
+            end
         end
+        failed = 0;
         if exp.cont_par.debug
             fprintf('Step size %g\n', h);
         end

@@ -19,8 +19,9 @@ end
 % Get the current target
 target = exp.rtc.par.x_target_coeffs;
 
-% The harmonics of interest
-harmonics = exp.fourier.idx_higher;
+% The harmonics of interest (include the DC level to remove any
+% mis-alignment issues)
+harmonics = [exp.fourier.idx_DC, exp.fourier.idx_higher];
 
 % Do the Picard iteration
 i = 0;
