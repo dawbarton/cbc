@@ -74,7 +74,7 @@ if ismethod(p, 'addParameter')
     add_par = @p.addParameter;
 else
     % Old versions of Matlab
-    add_par = @p.addParamValue;
+    add_par = @p.addParamValue; %#ok<NVREPL>
 end
 p.addOptional('direction', 1, @(x)or(x == -1, x == +1));
 add_par('out_range', [0, Inf], @(x)(x(2) > x(1)));

@@ -31,7 +31,7 @@ if ismethod(p, 'addParameter')
     add_par = @p.addParameter;
 else
     % Old versions of Matlab
-    add_par = @p.addParamValue;
+    add_par = @p.addParamValue; %#ok<NVREPL>
 end
 add_par('default_fields', true, @islogical);
 add_par('static_fields', {}, @iscellstr);
