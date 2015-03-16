@@ -2,10 +2,12 @@ function [data, y] = cbc_continex_wrapper(data, x, p)
 
 % Set the control target and the desired parameter value
 data.rtc.par.x_target_coeffs(data.fourier.idx_fund) = x;
-if iscellstr(data.cont_par)
-    data.rtc.set_par(data.cont_par, num2cell(p));
-else
-    data.rtc.par.(data.cont_par) = p;
+if iscellstr(data.continex.par)
+    p = num2cell(p);
+    for i = 1:length(data.continex.par)
+        p{i} = data.continex.par_inv_scale.(data.continex.par{i})(p{i});
+    end
+    data.rtc.set_par(data.continex.par, p);
 end
 
 % Do a fixed-point (picard) iteration to eliminate the higher modes
